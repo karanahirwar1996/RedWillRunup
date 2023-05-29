@@ -6,7 +6,7 @@ import numpy as np
 import posemails
 import negemails
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name(./original-advice-385307-e221975bf7db.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('./original-advice-385307-e221975bf7db.json', scope)
 client = gspread.authorize(creds)
 gs = client.open('Data_Source')
 analysis_sheet=gs.worksheet('Analysis')
