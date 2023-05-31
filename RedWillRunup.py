@@ -34,10 +34,8 @@ filtered_df = analysis_df.loc[(analysis_df['mnChange'] > 0) &
 sorted_df = filtered_df.sort_values(by=["3mAvgVol", "vol"], ascending=False).reset_index(drop=True)
 
 # Select relevant columns for positive and negative dataframes
-sorted_posdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg',
-                          '52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
-#sorted_negdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg',
-                          '52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
+sorted_posdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg','52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
+#sorted_negdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg','52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
 
 # Call email functions with sorted dataframes and the original analysis dataframe
 posemails.pos_email(sorted_posdf, analysis_df)
