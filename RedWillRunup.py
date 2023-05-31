@@ -21,6 +21,9 @@ analysis_df["52wHigh"] = analysis_df["52wHigh"].replace("", np.nan).astype(float
 analysis_df["52wavg"] = round(((analysis_df["52wLow"] + analysis_df["52wHigh"]) / 2), 2)
 analysis_df.rename({"Market Cap Label": "Label"}, axis=1, inplace=True)
 
+# Convert 'mnChange' column to numeric type
+analysis_df["mnChange"] = pd.to_numeric(analysis_df["mnChange"], errors='coerce')
+
 # Filter data based on conditions
 filtered_df = analysis_df.loc[(analysis_df['mnChange'] > 0) &
                               (analysis_df['lastPrice'] <= analysis_df['52wLow'] * 1.1) &
