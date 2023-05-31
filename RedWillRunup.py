@@ -26,7 +26,7 @@ analysis_df["mnChange"] = pd.to_numeric(analysis_df["mnChange"], errors='coerce'
 
 # Filter data based on conditions
 filtered_df = analysis_df.loc[(analysis_df['mnChange'] > 0) &
-                              (analysis_df['lastPrice'] <= analysis_df['52wLow'] * 1.2) &
+                              (analysis_df['lastPrice'] <= analysis_df['52wLow'] * 1.3) &
                               (analysis_df['Deep Score'] > 0) &
                               (analysis_df['Match Stock'] != "")].copy()
 
