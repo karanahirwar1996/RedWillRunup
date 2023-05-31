@@ -5,21 +5,37 @@ from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import posemails
 import negemails
+
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('./original-advice-385307-e221975bf7db.json', scope)
 client = gspread.authorize(creds)
 gs = client.open('Data_Source')
-analysis_sheet=gs.worksheet('Analysis')
-all_record_analysis=analysis_sheet.get_all_records()
-analysis_df=pd.DataFrame(all_record_analysis)
-analysis_df["Deep Score"]=analysis_df["Deep Score"].replace("",np.nan).astype(float)
-analysis_df["52wLow"]=analysis_df["52wLow"].replace("",np.nan).astype(float)
-analysis_df["52wHigh"]=analysis_df["52wHigh"].replace("",np.nan).astype(float)
-analysis_df["52wavg"]=round(((analysis_df["52wLow"]+analysis_df["52wHigh"])/2),2)
-analysis_df.rename({"Market Cap Label":"Label"},axis=1,inplace=True)
-sorted_pos=analysis_df.loc[(analysis_df['Deep Score']>50)*(analysis_df['Normal Score']>=0)*(analysis_df['Match Stock']!="")].reset_index(drop=True)
-sorted_neg=analysis_df.loc[(analysis_df['Deep Score']<=0)*(analysis_df['Normal Score']<=0)*(analysis_df['Match Stock']!="")].reset_index(drop=True)
-sorted_posdf=sorted_pos[['Match Stock','Label','lastPrice',"mnChange","52wLow","52wavg","52wHigh","3mAvgVol","vol",'Date','Deep Score']].copy()
-sorted_negdf=sorted_neg[['Match Stock','Label','lastPrice',"mnChange","52wLow","52wavg","52wHigh","3mAvgVol","vol",'Date','Deep Score']].copy()
-posemails.pos_email(sorted_posdf,analysis_df)
-negemails.neg_email(sorted_negdf,analysis_df)
+analysis_sheet = gs.worksheet('Analysis')
+all_record_analysis = analysis_sheet.get_all_records()
+analysis_df = pd.DataFrame(all_record_analysis)
+
+# Convert columns to appropriate data types
+analysis_df["Deep Score"] = analysis_df["Deep Score"].replace("", np.nan).astype(float)
+analysis_df["52wLow"] = analysis_df["52wLow"].replace("", np.nan).astype(float)
+analysis_df["52wHigh"] = analysis_df["52wHigh"].replace("", np.nan).astype(float)
+analysis_df["52wavg"] = round(((analysis_df["52wLow"] + analysis_df["52wHigh"]) / 2), 2)
+analysis_df.rename({"Market Cap Label": "Label"}, axis=1, inplace=True)
+
+# Filter data based on conditions
+filtered_df = analysis_df.loc[(analysis_df['mnChange'] > 0) &
+                              (analysis_df['lastPrice'] <= analysis_df['52wLow'] * 1.1) &
+                              (analysis_df['Deep Score'] > 0) &
+                              (analysis_df['Match Stock'] != "")].copy()
+
+# Sort filtered data based on "3mAvgVol" and "vol" in descending order
+sorted_df = filtered_df.sort_values(by=["3mAvgVol", "vol"], ascending=False).reset_index(drop=True)
+
+# Select relevant columns for positive and negative dataframes
+sorted_posdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg',
+                          '52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
+sorted_negdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg',
+                          '52wHigh', '3mAvgVol', 'vol', 'Date', 'Deep Score']].copy()
+
+# Call email functions with sorted dataframes and the original analysis dataframe
+posemails.pos_email(sorted_posdf, analysis_df)
+negemails.neg_email(sorted_negdf, analysis_df)
