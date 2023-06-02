@@ -31,7 +31,7 @@ filtered_df = analysis_df.loc[(analysis_df['mnChange'] > 0) &
                               (analysis_df['Match Stock'] != "")].copy()
 
 # Sort filtered data based on "3mAvgVol" and "vol" in descending order
-sorted_df = filtered_df.sort_values(by=["Deep Score", "vol","Buying-Triger"], ascending=False).reset_index(drop=True)
+sorted_df = filtered_df.sort_values(by=["Buying-Triger","Deep Score", "vol"], ascending=False).reset_index(drop=True)
 
 # Select relevant columns for positive and negative dataframes
 sorted_posdf = sorted_df[['Match Stock', 'Label', 'lastPrice', 'mnChange', '52wLow', '52wavg','52wHigh',"Buying-Triger",'vol', 'Date', 'Deep Score']].copy()
